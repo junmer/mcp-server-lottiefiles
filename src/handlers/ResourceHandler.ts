@@ -3,71 +3,37 @@ import { ListResourcesRequest, ReadResourceRequest } from '@modelcontextprotocol
 
 export class ResourceHandler {
   constructor(private apiClient: LottieApiClient) {
-    this.apiClient = apiClient
+    this.apiClient = apiClient;
   }
 
   async listResources(request: ListResourcesRequest) {
     return {
-      resources: [
-        {
-          name: "animations",
-          description: "List of Lottie animations",
-          schema: {
-            type: "object",
-            properties: {
-              query: {
-                type: "string",
-                description: "Search keywords"
-              },
-              page: {
-                type: "integer",
-                description: "Page number"
-              },
-              limit: {
-                type: "integer",
-                description: "Number of items per page"
-              }
-            }
-          }
-        },
-        {
-          name: "popular",
-          description: "Popular Lottie animations",
-          schema: {
-            type: "object",
-            properties: {
-              page: {
-                type: "integer",
-                description: "Page number"
-              },
-              limit: {
-                type: "integer",
-                description: "Number of items per page"
-              }
-            }
-          }
-        }
-      ]
+      resources: [{
+        uri: "lottiefiles://resources/popular",
+        name: "popular",
+        mimeType: "application/json",
+        description: "Popular Lottie animations"
+      }]
     };
   }
 
   async readResource(request: ReadResourceRequest) {
-    const { uri } = request.params;
-    const name = uri.split('/')[0];
+    const { name, uri } = request.params;
 
     switch (name) {
-      case "animations":
-        return await this.apiClient.searchAnimations(
-          request.params.query as string,
+      case "popular": {
+        const popularList = await this.apiClient.getPopularAnimations(
           request.params.page as number,
           request.params.limit as number
         );
-
-      case "popular":
-        return await this.apiClient.getPopularAnimations(
-          request.params.page as number,
-          request.params.limit as number
-        );
+        return {
+          contents: [{
+            uri,
+            mimeType: "application/json",
+            text: JSON.stringify(popularList, null, 2)
+          }]
+        };
+      }
 
       default:
         throw new Error(`Unknown resource: ${name}`);

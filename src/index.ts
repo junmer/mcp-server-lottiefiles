@@ -1,42 +1,50 @@
 #!/usr/bin/env node
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { 
-  ListToolsRequestSchema, 
+import {
+  ListToolsRequestSchema,
   CallToolRequestSchema,
   ListResourcesRequestSchema,
   ReadResourceRequestSchema,
   ListPromptsRequestSchema,
-  GetPromptRequestSchema
+  GetPromptRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import dotenv from "dotenv";
 
-import { Config } from "./config/Config.js";
 import { LottieApiClient } from "./api/LottieApiClient.js";
 import { ToolHandler } from "./handlers/ToolHandler.js";
 import { ResourceHandler } from "./handlers/ResourceHandler.js";
 import { PromptHandler } from "./handlers/PromptHandler.js";
 import { ErrorHandler } from "./error/ErrorHandler.js";
-
 class LottieServer {
-  private server: Server;
-  private apiClient: LottieApiClient;
-  private toolHandler: ToolHandler;
-  private resourceHandler: ResourceHandler;
-  private promptHandler: PromptHandler;
+  private readonly server: Server;
+  private readonly apiClient: LottieApiClient;
+  private readonly toolHandler: ToolHandler;
+  private readonly resourceHandler: ResourceHandler;
+  private readonly promptHandler: PromptHandler;
 
   constructor() {
-    const config = Config.getInstance();
-    
+    // Load environment variables
+    dotenv.config();
+
     // Initialize API client
-    this.apiClient = new LottieApiClient(config.getApiKey());
+    this.apiClient = new LottieApiClient();
 
     // Initialize handlers
     this.toolHandler = new ToolHandler(this.apiClient);
     this.resourceHandler = new ResourceHandler(this.apiClient);
     this.promptHandler = new PromptHandler();
 
-    // Initialize server
-    this.server = new Server(
+    // Initialize server with configuration
+    this.server = this.initializeServer();
+
+    // Setup handlers and error handling
+    this.setupHandlers();
+    this.setupErrorHandling();
+  }
+
+  private initializeServer(): Server {
+    return new Server(
       {
         name: "lottiefiles-server",
         version: "1.0.0",
@@ -47,29 +55,22 @@ class LottieServer {
           resources: {
             list: true,
             read: true,
-            subscribe: false
+            subscribe: false,
           },
           prompts: {
             list: true,
-            get: true
-          }
-        }
+            get: true,
+          },
+        },
       }
     );
-
-    this.setupHandlers();
-    this.setupErrorHandling();
-
-    this.apiClient.searchAnimations("test", 1, 20);
-    this.apiClient.getPopularAnimations(1, 20);
   }
 
   private setupErrorHandling(): void {
     this.server.onerror = (error) => {
       console.error("[MCP Error]", error);
     };
-
-    process.on('SIGINT', async () => {
+    process.on("SIGINT", async () => {
       await this.server.close();
       process.exit(0);
     });
@@ -80,19 +81,25 @@ class LottieServer {
     this.server.setRequestHandler(ListToolsRequestSchema, async (request) => {
       return await this.toolHandler.listTools(request);
     });
-  
+
     this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
       return await this.toolHandler.callTool(request);
     });
 
     // Resource handlers
-    this.server.setRequestHandler(ListResourcesRequestSchema, async (request) => {
-      return await this.resourceHandler.listResources(request);
-    });
+    this.server.setRequestHandler(
+      ListResourcesRequestSchema,
+      async (request) => {
+        return await this.resourceHandler.listResources(request);
+      }
+    );
 
-    this.server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
-      return await this.resourceHandler.readResource(request);
-    });
+    this.server.setRequestHandler(
+      ReadResourceRequestSchema,
+      async (request) => {
+        return await this.resourceHandler.readResource(request);
+      }
+    );
 
     // Prompt handlers
     this.server.setRequestHandler(ListPromptsRequestSchema, async (request) => {
@@ -113,7 +120,5 @@ class LottieServer {
 // Start the server
 const server = new LottieServer();
 server.run().catch((error) => {
-  console.error('Failed to start server:', error);
-  process.exit(1);
-}); 
-
+  ErrorHandler.handleError(error);
+});
