@@ -4,7 +4,7 @@
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "mcp-server-lottiefiles": "./dist/index.js"
+    "mcp-server-lottiefiles": "dist/index.js"
   },
   "scripts": {
     "build": "tsc",
