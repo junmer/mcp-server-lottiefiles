@@ -1,4 +1,5 @@
 # LottieFiles MCP Server
+[![smithery badge](https://smithery.ai/badge/mcp-server-lottiefiles)](https://smithery.ai/server/mcp-server-lottiefiles)
 
 A Model Context Protocol (MCP) server for searching and retrieving Lottie animations from LottieFiles.
 
@@ -10,6 +11,15 @@ A Model Context Protocol (MCP) server for searching and retrieving Lottie animat
 
 ## Installation
 
+### Installing via Smithery
+
+To install LottieFiles Server for Claude Desktop automatically via [Smithery](https://smithery.ai/server/mcp-server-lottiefiles):
+
+```bash
+npx -y smithery install mcp-server-lottiefiles --client claude
+```
+
+### Manual Installation
 ```bash
 npm install
 ```
