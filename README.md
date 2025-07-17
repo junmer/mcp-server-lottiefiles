@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/junmer-mcp-server-lottiefiles-badge.png)](https://mseep.ai/app/junmer-mcp-server-lottiefiles)
+
 # LottieFiles MCP Server
 [![smithery badge](https://smithery.ai/badge/mcp-server-lottiefiles)](https://smithery.ai/server/mcp-server-lottiefiles)
 
