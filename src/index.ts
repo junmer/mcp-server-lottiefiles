@@ -53,14 +53,9 @@ class LottieServer {
         capabilities: {
           tools: {},
           resources: {
-            list: true,
-            read: true,
             subscribe: false,
           },
-          prompts: {
-            list: true,
-            get: true,
-          },
+          prompts: {},
         },
       }
     );

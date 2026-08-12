@@ -18,14 +18,12 @@ export class ResourceHandler {
   }
 
   async readResource(request: ReadResourceRequest) {
-    const { name, uri } = request.params;
+    const { uri } = request.params;
+    const name = uri.split("/").pop();
 
     switch (name) {
       case "popular": {
-        const popularList = await this.apiClient.getPopularAnimations(
-          request.params.page as number,
-          request.params.limit as number
-        );
+        const popularList = await this.apiClient.getPopularAnimations();
         return {
           contents: [{
             uri,
