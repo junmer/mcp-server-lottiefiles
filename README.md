@@ -1,5 +1,5 @@
 # LottieFiles MCP Server
-[![smithery badge](https://smithery.ai/badge/mcp-server-lottiefiles)](https://smithery.ai/server/mcp-server-lottiefiles)
+[![LightNow capabilities](https://lightnow.ai/badge/io.github.junmer/mcp-server-lottiefiles)](https://lightnow.ai/servers/io.github.junmer/mcp-server-lottiefiles)
 
 A Model Context Protocol (MCP) server for searching and retrieving Lottie animations from LottieFiles.
 
